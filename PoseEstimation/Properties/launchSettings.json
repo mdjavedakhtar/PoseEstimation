@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "PoseEstimation (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "PoseEstimation (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
