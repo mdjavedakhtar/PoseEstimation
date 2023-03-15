@@ -7,3 +7,11 @@ Thanks to https://github.com/shimat/opencvsharp for writing the OpenCVSharp4 lib
 C#
 OpenCV
 OpenCVSharp4
+
+###ChangeLog
+15/03/2023
+```
+Limit Number of threads
+Fix background thread exit on app close
+added 10Px to text to stop overlap
+```

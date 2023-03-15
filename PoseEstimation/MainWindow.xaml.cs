@@ -7,6 +7,7 @@ using System.Drawing;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using OpenCvSharp.Dnn;
+using System.Diagnostics;
 
 namespace PoseEstimation {
     public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
@@ -41,6 +42,7 @@ namespace PoseEstimation {
             _videoCapture = VideoCapture.FromCamera(0, _videoCaptureApi);
 
             _captureThread = new Thread(startCapture);
+            _captureThread.IsBackground = true;                                 // Make the thread Background
             _captureThread.Start();
 
             net = CvDnn.ReadNetFromTensorflow("C:/graph_opt.pb");
@@ -60,7 +62,7 @@ namespace PoseEstimation {
                 _videoCapture.Read(_capturedFrame);
                 if (!(_capturedFrame.Empty())) {
                     _ = this.DispatcherQueue.TryEnqueue(() => {
-                        
+                        Cv2.SetNumThreads(8);                                   //Limit number of threads to reduce CPU load
                         Bitmap qrCodeBitmap = BitmapConverter.ToBitmap(_capturedFrame);
 
                         net.SetInput(CvDnn.BlobFromImage(_capturedFrame, 1.0, s1, s2, true, false));
@@ -88,15 +90,15 @@ namespace PoseEstimation {
                                 if (outputPoints[i, 2] > 0.25) {
                                     brushEclipse= Brushes.LightGreen;
                                 }
-                                else if (outputPoints[i, 2] < 0.1) {
+                                else if (outputPoints[i, 2] < 0.15) {
                                     brushEclipse = Brushes.Red;
                                 }
                                 else {
                                     brushEclipse = Brushes.Blue;
                                 }
-                                if (outputPoints[i, 2] > 0.1) {
+                                if (outputPoints[i, 2] > 0.15) {
                                     g.FillEllipse(brushEclipse, outputPoints[i, 0], outputPoints[i, 1], 10, 10);
-                                    g.DrawString(BODY_PARTS[i] + " , " + outputPoints[i, 2].ToString(), new Font("Tahoma", 10), brushEclipse, new PointF(outputPoints[i, 0], outputPoints[i, 1]));
+                                    g.DrawString(BODY_PARTS[i] + " , " + outputPoints[i, 2].ToString(), new Font("Ariel", 10), brushEclipse, new PointF(outputPoints[i, 0]+10, outputPoints[i, 1]));
                                 }
 
                             }
@@ -114,7 +116,7 @@ namespace PoseEstimation {
             }
         }
         private void MainWindow_Closed(object sender, WindowEventArgs args) {
-            _captureThread.Interrupt();
+            Environment.Exit(Environment.ExitCode);                         // Close all thread
         }
     }
 }
