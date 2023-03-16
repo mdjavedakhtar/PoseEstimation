@@ -63,7 +63,7 @@ namespace PoseEstimation {
                 if (!(_capturedFrame.Empty())) {
                     _ = this.DispatcherQueue.TryEnqueue(() => {
                         Cv2.SetNumThreads(8);                                   //Limit number of threads to reduce CPU load
-                        Bitmap qrCodeBitmap = BitmapConverter.ToBitmap(_capturedFrame);
+                        Bitmap bitmapFrameRotation = BitmapConverter.ToBitmap(_capturedFrame);
 
                         net.SetInput(CvDnn.BlobFromImage(_capturedFrame, 1.0, s1, s2, true, false));
 
@@ -83,7 +83,7 @@ namespace PoseEstimation {
                         }
                         //Debug.WriteLine(outputPoints[0,0]);
 
-                        Graphics g = Graphics.FromImage(qrCodeBitmap);
+                        Graphics g = Graphics.FromImage(bitmapFrameRotation);
 
                         for (int i = 0; i <= 18; i++) {
                             if ((outputPoints[i, 0] > 0) && (outputPoints[i, 0] > 0)) {
@@ -106,7 +106,7 @@ namespace PoseEstimation {
 
                         BitmapImage bitmapImage = new BitmapImage();
                         using (MemoryStream stream = new MemoryStream()) {
-                            qrCodeBitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                            bitmapFrameRotation.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
                             stream.Position = 0;
                             bitmapImage.SetSource(stream.AsRandomAccessStream());
                         }
